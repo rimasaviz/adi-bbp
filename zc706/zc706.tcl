@@ -74,7 +74,7 @@ make_wrapper -files [get_files zc706.srcs/sources_1/bd/system/system.bd] -top
 import_files -force -norecurse -fileset sources_1 zc706.srcs/sources_1/bd/system/hdl/system_wrapper.v
 
 adi_project_files zc706 [list \
-  "$ad_hdl_dir/library/common/ad_iobuf.v" \
+  "$ad_hdl_dir/library/xilinx/common/ad_iobuf.v" \
   "$ad_hdl_dir/projects/fmcomms2/zc706/system_top.v" \
   "$ad_hdl_dir/projects/fmcomms2/zc706/system_constr.xdc"\
   "$ad_hdl_dir/projects/common/zc706/zc706_system_constr.xdc" ]

@@ -13,14 +13,16 @@ M_DEPS += $(ADI_HDL_DIR)/library/axi_clkgen/axi_clkgen.xpr
 M_DEPS += $(ADI_HDL_DIR)/library/axi_hdmi_tx/axi_hdmi_tx.xpr
 M_DEPS += $(ADI_HDL_DIR)/library/axi_spdif_tx/axi_spdif_tx.xpr
 M_DEPS += $(ADI_HDL_DIR)/library/axi_dmac/axi_dmac.xpr
+M_DEPS += $(ADI_HDL_DIR)/library/util_clkdiv/util_clkdiv.xpr
 M_DEPS += $(ADI_HDL_DIR)/library/util_cpack/util_cpack.xpr
 M_DEPS += $(ADI_HDL_DIR)/library/util_upack/util_upack.xpr
+M_DEPS += $(ADI_HDL_DIR)/library/util_rfifo/util_rfifo.xpr
 M_DEPS += $(ADI_HDL_DIR)/library/util_wfifo/util_wfifo.xpr
 M_DEPS += $(ADI_HDL_DIR)/library/util_tdd_sync/util_tdd_sync.xpr
 M_DEPS += $(ADI_HDL_DIR)/library/axi_ad9361/axi_ad9361.xpr
 M_DEPS += ../ip/axi_xcomm2ip/axi_xcomm2ip.xpr
 
-M_DEPS += $(ADI_HDL_DIR)/library/common/ad_iobuf.v
+M_DEPS += $(ADI_HDL_DIR)/library/xilinx/common/ad_iobuf.v
 M_DEPS += $(ADI_HDL_DIR)/projects/fmcomms2/zc706/system_top.v
 M_DEPS += $(ADI_HDL_DIR)/projects/fmcomms2/zc706/system_constr.xdc
 M_DEPS += $(ADI_HDL_DIR)/projects/fmcomms2/zc706/system_bd.tcl
@@ -57,8 +59,10 @@ clean-all:clean
 	make -C $(ADI_HDL_DIR)/library/axi_hdmi_tx clean
 	make -C $(ADI_HDL_DIR)/library/axi_spdif_tx clean
 	make -C $(ADI_HDL_DIR)/library/axi_dmac clean
+	make -C $(ADI_HDL_DIR)/library/util_clkdiv clean
 	make -C $(ADI_HDL_DIR)/library/util_cpack clean
 	make -C $(ADI_HDL_DIR)/library/util_upack clean
+	make -C $(ADI_HDL_DIR)/library/util_rfifo clean
 	make -C $(ADI_HDL_DIR)/library/util_wfifo clean
 	make -C $(ADI_HDL_DIR)/library/util_tdd_sync clean
 	make -C $(ADI_HDL_DIR)/library/axi_ad9361 clean
@@ -75,9 +79,11 @@ lib:
 	make -C $(ADI_HDL_DIR)/library/axi_hdmi_tx
 	make -C $(ADI_HDL_DIR)/library/axi_spdif_tx
 	make -C $(ADI_HDL_DIR)/library/axi_dmac
+	make -C $(ADI_HDL_DIR)/library/util_clkdiv
 	make -C $(ADI_HDL_DIR)/library/util_cpack
 	make -C $(ADI_HDL_DIR)/library/util_upack
 	make -C $(ADI_HDL_DIR)/library/util_wfifo
+	make -C $(ADI_HDL_DIR)/library/util_rfifo
 	make -C $(ADI_HDL_DIR)/library/util_tdd_sync
 	make -C $(ADI_HDL_DIR)/library/axi_ad9361
 	make -C ../ip/axi_xcomm2ip
