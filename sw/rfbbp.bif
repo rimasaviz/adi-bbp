@@ -1,0 +1,6 @@
+image: {
+	[bootloader]fsbl.elf
+	system_top.bit
+	u-boot-zc70x.elf
+}
+
