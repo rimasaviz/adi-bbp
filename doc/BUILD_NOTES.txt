@@ -1,0 +1,27 @@
+source /scratch/rimas/xilinx/SDK/2016.2/settings64.sh
+
+export ARCH=arm
+export CROSS_COMPILE=arm-xilinx-linux-gnueabi-
+make zynq_xcomm_adv7511_defconfig
+
+make -j5 UIMAGE_LOADADDR=0x8000 uImage
+make zynq-zc706-adv7511-ad9361-fmcomms2-3.dts
+
+Copy the generated files to your SD Card
+dave@hal9000:~/github-linux-build/linux$ cp arch/arm/boot/uImage /media/BOOT/uImage
+dave@hal9000:~/github-linux-build/linux$ cp arch/arm/boot/dts/zynq-zc702-adv7511-ad9361.dtb  /media/BOOT/devicetree.dtb
+
+On the target platform
+
+Modifying devicetrees
+1. Make sure the boot partition is mounted. On new images, this can be done by right-clicking the boot icon on the desktop and selecting the “Mount Volume” option. The partition will then be mounted at /media/analog/boot.
+
+2. Convert the compiled devicetree related to the target back into an editable format.
+
+dave@hal9000:/media/analog/boot/zynq-zc702-adv7511$ dtc -I dtb -O dts -o devicetree.dts devicetree.dtb
+3. Modify the devicetree.dts file as required.
+
+4. Recompile the devicetree file. Note that this will overwrite the original dtb file, copy or rename the original file if you want to keep it before running this step.
+
+dave@hal9000:/media/analog/boot/zynq-zc702-adv7511$ dtc -I dts -O dtb -o devicetree.dtb devicetree.dts
+
