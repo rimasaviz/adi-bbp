@@ -10,7 +10,6 @@ adi_ip_files axi_xcomm2ip [list \
   "$ad_hdl_dir/library/common/ad_rst.v" \
   "$ad_hdl_dir/library/common/ad_mem.v" \
   "$ad_hdl_dir/library/common/up_axi.v" \
-  "axi_xcomm2ip_core.v" \
   "axi_xcomm2ip.v" ]
 
 adi_ip_properties axi_xcomm2ip
