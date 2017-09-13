@@ -5,6 +5,7 @@ M_DIR := $(shell pwd)
 
 export ADI_HDL_DIR := $(M_DIR)/../hdl
 export ADI_PHDL_DIR := $(M_DIR)/../hdl
+export ADI_IGNORE_VERSION_CHECK := 1
 
 M_DEPS += $(ADI_HDL_DIR)/projects/scripts/adi_env.tcl
 M_DEPS += $(ADI_HDL_DIR)/projects/scripts/adi_board.tcl
