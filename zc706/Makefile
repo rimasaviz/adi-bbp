@@ -35,6 +35,8 @@ M_DEPS += zc706.tcl
 M_VIVADO := vivado -mode batch -source
 
 M_FLIST := *.cache
+M_FLIST += *.hw
+M_FLIST += *.ip_user_files
 M_FLIST += *.data
 M_FLIST += *.xpr
 M_FLIST += *.log
