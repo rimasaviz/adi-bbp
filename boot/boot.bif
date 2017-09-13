@@ -1,0 +1,6 @@
+the_ROM_image:
+{
+  [bootloader]./ADI/zynq_fsbl_0.elf
+  ../zc706/zc706.runs/impl_1/system_top.bit
+  ./ADI/u-boot-zc70x.elf
+}

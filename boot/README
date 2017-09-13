@@ -1,0 +1,53 @@
+current setup appears to work (using Vivado 2016.4)
+
+after generating a bit file (using the fmcomms2_fir_filter branch of the ADI hdl repo),
+run the build.sh to generate a new BOOT.BIN file (using the FSBL, U-BOOT and device tree files
+that were present on the SD card image).
+
+Copy (only?) the new BOOT.BIN to the SD card
+
+haven't yet succeeded  in using a self-compiled kernel (uImage produced by ADI linux repo),
+u-boot (from u-boot-xilinx repo) and vivado built FSBL.
+
+To generate an FSBL, run "hsi" in the fmcomms2_fir_filter_zc706.sdk/ directory
+and type the following commands:
+
+set hwdsgn [open_hw_design system_top.hdf]
+generate_app -hw $hwdsgn -os standalone -proc ps7_cortexa9_0 -app zynq_fsbl -compile -sw fsbl -dir .
+
+this will produce an executable.elf file (FSBL)
+
+to build the linux kernel, I did:
+
+export ARCH=arm
+export CROSS_COMPILE=arm-xilinx-linux-gnueabi-
+  OR
+export CROSS_COMPILE=/scratch/rimas/xilinx/SDK/2016.4/gnu/arm/lin/bin/arm-xilinx-linux-gnueabi-
+
+make zynq_xcomm_adv7511_defconfig
+make -j uImage LOADADDR=0x00008000
+
+kernel blob will be in:
+arch/arm/boot/uImage
+
+to generate device tree blob, type:
+
+make zynq-zc706-adv7511-ad9361-fmcomms2-3.dtb
+
+output will be in:
+
+arch/arm/boot/dts
+
+when I tried building u-boot, I set ARCH and CROSS_COMPILE as above and ran:
+
+make zynq_zc706_config
+make
+
+it produced a u-boot.bin file (but no elf?)
+not quite sure what's going on, don't care for now
+also this machine was missing openssl related include files, so I edited .config to comment out
+
+CONFIG_FIT_SIGNATURE
+
+which disabled crypto stuff and allowed the build to finish
+

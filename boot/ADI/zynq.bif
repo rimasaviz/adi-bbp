@@ -1,0 +1,6 @@
+the_ROM_image:
+{
+[bootloader]./output/fsbl/Debug/fsbl.elf
+./output/hw/system_top.bit
+./u-boot-zc70x.elf
+}
