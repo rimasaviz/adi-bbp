@@ -21,7 +21,7 @@ M_DEPS += $(ADI_HDL_DIR)/library/util_rfifo/util_rfifo.xpr
 M_DEPS += $(ADI_HDL_DIR)/library/util_wfifo/util_wfifo.xpr
 M_DEPS += $(ADI_HDL_DIR)/library/util_tdd_sync/util_tdd_sync.xpr
 M_DEPS += $(ADI_HDL_DIR)/library/axi_ad9361/axi_ad9361.xpr
-M_DEPS += ../ip/axi_xcomm2ip/axi_xcomm2ip.xpr
+M_DEPS += ../ip/axi_ofdmbbp_tx/axi_ofdmbbp_tx.xpr
 
 M_DEPS += $(ADI_HDL_DIR)/library/xilinx/common/ad_iobuf.v
 M_DEPS += $(ADI_HDL_DIR)/projects/fmcomms2/zc706/system_top.v
@@ -45,6 +45,8 @@ M_FLIST +=  xgui
 M_FLIST += *.runs
 M_FLIST += *.srcs
 M_FLIST += *.sdk
+M_FLIST += *.sim
+M_FLIST += *.str
 M_FLIST += .Xil
 
 
@@ -69,7 +71,7 @@ clean-all:clean
 	make -C $(ADI_HDL_DIR)/library/util_wfifo clean
 	make -C $(ADI_HDL_DIR)/library/util_tdd_sync clean
 	make -C $(ADI_HDL_DIR)/library/axi_ad9361 clean
-	make -C ../ip/axi_xcomm2ip clean
+	make -C ../ip/axi_ofdmbbp_tx clean
 
 
 xcomm2ip_zc706.sdk/system_top.hdf: $(M_DEPS)
@@ -89,7 +91,7 @@ lib:
 	make -C $(ADI_HDL_DIR)/library/util_rfifo
 	make -C $(ADI_HDL_DIR)/library/util_tdd_sync
 	make -C $(ADI_HDL_DIR)/library/axi_ad9361
-	make -C ../ip/axi_xcomm2ip
+	make -C ../ip/axi_ofdmbbp_tx
 
 ####################################################################################
 ####################################################################################

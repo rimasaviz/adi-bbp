@@ -1,8 +1,0 @@
-*.cache
-*.hw
-*.xpr
-*.log
-vivado.jou
-vivado.log
-xgui
-component.xml
