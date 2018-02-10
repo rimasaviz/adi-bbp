@@ -294,11 +294,11 @@ module axi_ofdmbbp_tx #(
     .din	        (up_wdata),
     .wr_en	      (up_wreq && (up_waddr == 14'h0100)),
     .rd_en	      (tx_cmd_ready & !cmdq_empty),
-    .dout	        ({tx_cmd_pause, tx_cmd_mode, tx_cmd_length}),
-    .full	        (cmdq_full),
+    .dout	      ({tx_cmd_pause, tx_cmd_mode, tx_cmd_length}),
+    .full	      (cmdq_full),
     .empty	      (cmdq_empty),
-    .rd_data_count(cmdq_rdcnt),
-    .wr_data_count(cmdq_wrcnt)
+    .rd_data_count    (cmdq_rdcnt),
+    .wr_data_count    (cmdq_wrcnt)
   );
 
   FpgaTxWrapper tx (

@@ -128,6 +128,8 @@ adi_project_files zc706 [list \
   "$ad_hdl_dir/projects/fmcomms2/zc706/system_constr.xdc"\
   "$ad_hdl_dir/projects/common/zc706/zc706_system_constr.xdc" ]
 
+start_gui
+
 #adi_project_run zc706
 
 
