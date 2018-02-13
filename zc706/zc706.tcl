@@ -48,70 +48,22 @@ ad_connect  axi_ofdmbbp_tx/dac_valid_i0 axi_ad9361/dac_valid_i0
 ad_connect  axi_ofdmbbp_tx/dac_data_i0 axi_ad9361/dac_data_i0
 ad_connect  axi_ofdmbbp_tx/dac_valid_q0 axi_ad9361/dac_valid_q0
 ad_connect  axi_ofdmbbp_tx/dac_data_q0 axi_ad9361/dac_data_q0
-#ad_connect  axi_ofdmbbp_tx/dac_valid_i1 axi_ad9361/dac_valid_i1
-#ad_connect  axi_ofdmbbp_tx/dac_data_i1 axi_ad9361/dac_data_i1
-#ad_connect  axi_ofdmbbp_tx/dac_valid_q1 axi_ad9361/dac_valid_q1
-#ad_connect  axi_ofdmbbp_tx/dac_data_q1 axi_ad9361/dac_data_q1
+ad_connect  axi_ofdmbbp_tx/dac_valid_i1 axi_ad9361/dac_valid_i1
+ad_connect  axi_ofdmbbp_tx/dac_data_i1 axi_ad9361/dac_data_i1
+ad_connect  axi_ofdmbbp_tx/dac_valid_q1 axi_ad9361/dac_valid_q1
+ad_connect  axi_ofdmbbp_tx/dac_data_q1 axi_ad9361/dac_data_q1
 ad_connect  axi_ofdmbbp_tx/dac_dovf axi_ad9361/dac_dovf
 ad_connect  axi_ofdmbbp_tx/dac_dunf axi_ad9361/dac_dunf
 
-#ad_connect  util_ad9361_dac_upack/dac_data_0 axi_ofdmbbp_tx/dma_data_i0
-#ad_connect  util_ad9361_dac_upack/dac_data_1 axi_ofdmbbp_tx/dma_data_q0
-#ad_connect  util_ad9361_dac_upack/dac_data_2 axi_ofdmbbp_tx/dma_data_i1
-#ad_connect  util_ad9361_dac_upack/dac_data_3 axi_ofdmbbp_tx/dma_data_q1
-#ad_connect  axi_ad9361_dac_dma/fifo_rd_underflow axi_ofdmbbp_tx/dma_dunf
-#ad_connect  axi_ofdmbbp_tx/dma_dovf GND
+ad_connect  util_ad9361_dac_upack/dac_data_0 axi_ofdmbbp_tx/dma_data_i0
+ad_connect  util_ad9361_dac_upack/dac_data_1 axi_ofdmbbp_tx/dma_data_q0
+ad_connect  util_ad9361_dac_upack/dac_data_2 axi_ofdmbbp_tx/dma_data_i1
+ad_connect  util_ad9361_dac_upack/dac_data_3 axi_ofdmbbp_tx/dma_data_q1
+ad_connect  axi_ad9361_dac_dma/fifo_rd_underflow axi_ofdmbbp_tx/dma_dunf
+ad_connect  axi_ofdmbbp_tx/dma_dovf GND
 
 delete_bd_objs [get_bd_cells ila_adc]
 delete_bd_objs [get_bd_nets axi_ad9361_tdd_dbg] [get_bd_cells ila_tdd]
-
-#set ila_xc2 [create_bd_cell -type ip -vlnv xilinx.com:ip:ila:6.2 ila_xc2]
-#
-#set_property -dict [list CONFIG.C_MONITOR_TYPE {Native}] $ila_xc2
-#set_property -dict [list CONFIG.C_NUM_OF_PROBES {4}] $ila_xc2
-#set_property -dict [list CONFIG.C_PROBE0_WIDTH {1}] $ila_xc2
-#set_property -dict [list CONFIG.C_PROBE1_WIDTH {16}] $ila_xc2
-#set_property -dict [list CONFIG.C_PROBE2_WIDTH {1}] $ila_xc2
-#set_property -dict [list CONFIG.C_PROBE3_WIDTH {16}] $ila_xc2
-##set_property -dict [list CONFIG.C_PROBE4_WIDTH {128}] $ila_xc2
-##set_property -dict [list CONFIG.C_PROBE5_WIDTH {8}] $ila_xc2
-##set_property -dict [list CONFIG.C_PROBE6_WIDTH {128}] $ila_xc2
-##set_property -dict [list CONFIG.C_PROBE7_WIDTH {8}] $ila_xc2
-##set_property -dict [list CONFIG.C_PROBE8_WIDTH {1}] $ila_xc2
-#set_property -dict [list CONFIG.C_EN_STRG_QUAL {1}] $ila_xc2
-#
-#ad_connect ila_xc2/CLK axi_ad9361/clk
-#ad_connect ila_xc2/PROBE0 axi_ofdmbbp_tx/dac_valid_i0
-#ad_connect ila_xc2/PROBE1 axi_ofdmbbp_tx/dac_data_i0
-#ad_connect ila_xc2/PROBE2 axi_ofdmbbp_tx/dac_valid_q0
-#ad_connect ila_xc2/PROBE3 axi_ofdmbbp_tx/dac_data_q0
-
-#########
-
-#set ila_ad9671 [create_bd_cell -type ip -vlnv xilinx.com:ip:ila:6.1 ila_ad9671]
-#set_property -dict [list CONFIG.C_MONITOR_TYPE {Native}] $ila_ad9671
-#set_property -dict [list CONFIG.C_NUM_OF_PROBES {9}] $ila_ad9671
-#set_property -dict [list CONFIG.C_PROBE0_WIDTH {128}] $ila_ad9671
-#set_property -dict [list CONFIG.C_PROBE1_WIDTH {8}] $ila_ad9671
-#set_property -dict [list CONFIG.C_PROBE2_WIDTH {128}] $ila_ad9671
-#set_property -dict [list CONFIG.C_PROBE3_WIDTH {8}] $ila_ad9671
-#set_property -dict [list CONFIG.C_PROBE4_WIDTH {128}] $ila_ad9671
-#set_property -dict [list CONFIG.C_PROBE5_WIDTH {8}] $ila_ad9671
-#set_property -dict [list CONFIG.C_PROBE6_WIDTH {128}] $ila_ad9671
-#set_property -dict [list CONFIG.C_PROBE7_WIDTH {8}] $ila_ad9671
-#set_property -dict [list CONFIG.C_PROBE8_WIDTH {1}] $ila_ad9671
-#set_property -dict [list CONFIG.C_EN_STRG_QUAL {1}] $ila_ad9671
-#
-#ad_connect axi_ad9671_core_0/adc_clk  ila_ad9671/CLK
-#ad_connect axi_ad9671_core_0/adc_data   ila_ad9671/PROBE0
-#ad_connect axi_ad9671_core_0/adc_valid  ila_ad9671/PROBE1
-#ad_connect axi_ad9671_core_1/adc_data   ila_ad9671/PROBE2
-#ad_connect axi_ad9671_core_1/adc_valid  ila_ad9671/PROBE3
-#ad_connect axi_ad9671_core_2/adc_data   ila_ad9671/PROBE4
-#ad_connect axi_ad9671_core_2/adc_valid  ila_ad9671/PROBE5
-#ad_connect axi_ad9671_core_3/adc_data   ila_ad9671/PROBE6
-#ad_connect axi_ad9671_core_3/adc_valid  ila_ad9671/PROBE7
-#ad_connect usdrx1_fifo/adc_wovf         ila_ad9671/PROBE8
 
 #########
 regenerate_bd_layout
@@ -128,8 +80,24 @@ adi_project_files zc706 [list \
   "$ad_hdl_dir/projects/fmcomms2/zc706/system_constr.xdc"\
   "$ad_hdl_dir/projects/common/zc706/zc706_system_constr.xdc" ]
 
-start_gui
+#start_gui
 
 #adi_project_run zc706
 
+#launch_runs impl_1 -to_step write_bitstream -jobs 8
+#wait_on_run impl_1
 
+launch_runs synth_1 -jobs 8
+wait_on_run synth_1
+open_run synth_1 -name synth_1
+source ../new_batch_insert_ila.tcl
+batch_insert_ila 1024
+close_design
+set_property constrset debug_constraints.xdc [get_runs synth_1]
+set_property constrset debug_constraints.xdc [get_runs impl_1]
+
+reset_run synth_1
+launch_runs impl_1 -to_step write_bitstream -jobs 8
+wait_on_run impl_1
+
+start_gui

@@ -5,9 +5,19 @@ module axi_ofdmbbp_tx #(
   (
   // ad9361 dac interface
   input           dac_valid_i0,
+  input   [15:0]  dma_data_i0,
   output  [15:0]  dac_data_i0,
   input           dac_valid_q0,
+  input   [15:0]  dma_data_q0,
   output  [15:0]  dac_data_q0,
+  input           dac_valid_i1,
+  input   [15:0]  dma_data_i1,
+  output  [15:0]  dac_data_i1,
+  input           dac_valid_q1,
+  input   [15:0]  dma_data_q1,
+  output  [15:0]  dac_data_q1,
+  input           dma_dovf,
+  input           dma_dunf,
   output          dac_dovf,
   output          dac_dunf,
 
@@ -41,9 +51,17 @@ module axi_ofdmbbp_tx #(
   // parameters
   localparam  XCOMM2IP_SCLK_DIVIDE = (XCOMM2IP_1T1R_OR_2T2R_N == 1) ? "2" : "4";
 
+  wire dac_valid_i0_int;
+  assign dac_valid_i0_int = dac_valid_i0;
   // internal registers
+  reg             dac_enable_m1 = 'd0;
+  reg             dac_enable = 'd0;
   reg     [15:0]  dac_data_i0_int = 'd0;
   reg     [15:0]  dac_data_q0_int = 'd0;
+  reg     [15:0]  dac_data_i1_int = 'd0;
+  reg     [15:0]  dac_data_q1_int = 'd0;
+  reg             dac_dovf_int = 'd0;
+  reg dac_dunf_int = 'd0;
   reg     [ 3:0]  dac_raddr = 'd0;
   reg     [15:0]  dac_rdata_i = 'd0;
   reg     [15:0]  dac_rdata_q = 'd0;
@@ -51,38 +69,64 @@ module axi_ofdmbbp_tx #(
   reg     [15:0]  dac_data_q = 'd0;
   reg             s_dac_sync = 'd0;
   reg     [23:0]  s_dac_rdata = 'd0;
+  assign dac_data_i0 = dac_data_i0_int;
+  assign dac_data_q0 = dac_data_q0_int;
   reg             dac_sync_m1 = 'd0;
   reg             dac_sync = 'd0;
-(* mark_debug = "true" *)  reg             up_dac_preset = 'd0;
+  reg             up_dac_preset = 'd0;
   reg             up_dac_enable = 'd0;
 
   // internal signals
 
- (* mark_debug = "true" *) wire    [ 3:0]  s_dac_waddr_s;
- (* mark_debug = "true" *) wire    [15:0]  s_dac_wdata_i_s;
- (* mark_debug = "true" *) wire    [15:0]  s_dac_wdata_q_s;
+  wire    [ 3:0]  s_dac_waddr_s;
+  wire    [15:0]  s_dac_wdata_i_s;
+  wire    [15:0]  s_dac_wdata_q_s;
   wire    [15:0]  dac_rdata_i_s;
   wire    [15:0]  dac_rdata_q_s;
-  wire    [ 7:0]  s_dac_raddr_s;
-  wire    [23:0]  s_dac_rdata_s;
- (* mark_debug = "true" *) wire            s_dac_rst;
+  wire            s_dac_rst;
   wire            s_clk;
   wire            s_clk_s;
 
+ // assign dac_dovf = 1'b0; //dac_dovf_int;
+ // assign dac_dunf = 1'b0; //dac_dunf_int;
+
   assign dac_data_i0 = dac_data_i0_int;
   assign dac_data_q0 = dac_data_q0_int;
-  assign dac_dovf = 1'b0; //dac_dovf_int;
-  assign dac_dunf = 1'b0; //dac_dunf_int;
+  assign dac_data_i1 = dac_data_i1_int;
+  assign dac_data_q1 = dac_data_q1_int;
+  assign dac_dovf = dac_dovf_int;
+  assign dac_dunf = dac_dunf_int;
 
   always @(posedge rst or posedge clk) begin
     if (rst == 1'b1) begin
+      dac_enable_m1 <= 1'd0;
+      dac_enable <= 1'd0;
       dac_data_i0_int <= 'd0;
       dac_data_q0_int <= 'd0;
+      dac_data_i1_int <= 'd0;
+      dac_data_q1_int <= 'd0;
+      dac_dovf_int <= 'd0;
+      dac_dunf_int <= 'd0;
     end 
     else 
     begin
-      dac_data_i0_int <= dac_data_i;
-      dac_data_q0_int <= dac_data_q;
+      dac_enable_m1 <= up_dac_enable;
+      dac_enable <= dac_enable_m1;
+      if (dac_enable == 1'b1) begin
+        dac_data_i0_int <= dac_data_i;
+        dac_data_q0_int <= dac_data_q;
+        dac_data_i1_int <= 16'd0;
+        dac_data_q1_int <= 16'd0;
+        dac_dovf_int <= 1'd0;
+        dac_dunf_int <= 1'd0;
+      end else begin
+        dac_data_i0_int <= dma_data_i0;
+        dac_data_q0_int <= dma_data_q0;
+        dac_data_i1_int <= dma_data_i1;
+        dac_data_q1_int <= dma_data_q1;
+        dac_dovf_int <= dma_dovf;
+        dac_dunf_int <= dma_dunf;
+      end
     end
   end
 
@@ -172,12 +216,10 @@ module axi_ofdmbbp_tx #(
   always @(posedge s_axi_aclk)
   begin
     if (s_axi_aresetn == 1'b0) begin
- //     up_enable <= 'h00;
- //     up_pause <= 'h00;
       up_scratch <= 'h00;
       up_wack <= 1'b0;
       up_dac_preset <= 'd1;
-//      up_dac_enable <= 'd0;
+      up_dac_enable <= 'd0;
     end 
     else 
     begin
@@ -185,9 +227,8 @@ module axi_ofdmbbp_tx #(
       if (up_wreq) begin
         case (up_waddr)
         16'h002: up_scratch <= up_wdata;
-//        16'h003: {up_pause, up_enable} <= up_wdata[1:0];
         16'h004: up_dac_preset <= up_wdata[0];
-  //      16'h005: up_dac_enable <= up_wdata[0];
+        16'h005: up_dac_enable <= up_wdata[0];
         endcase
       end
     end
@@ -207,9 +248,8 @@ module axi_ofdmbbp_tx #(
       16'h000: up_rdata <= 32'hDEADBEEF;
       16'h001: up_rdata <= 32'hCAFEBABE;
       16'h002: up_rdata <= up_scratch;
-//      16'h003: up_rdata <= {30'd0, up_pause, up_enable};
       16'h004: up_rdata <= {31'd0, up_dac_preset};
-//      16'h005: up_rdata <= {31'd0, up_dac_enable};
+      16'h005: up_rdata <= {31'd0, up_dac_enable};
       16'h101: up_rdata <= {25'd0, cmdq_wrcnt};
       16'h201: up_rdata <= {22'd0, dataq_wrcnt};
       default: up_rdata <= 'h00;
@@ -250,14 +290,14 @@ module axi_ofdmbbp_tx #(
   );
 
   // everything below here is specific to BBP
- (* mark_debug = "true" *) wire		tx_dout_valid;
- (* mark_debug = "true" *) wire		tx_din_ready;
- (* mark_debug = "true" *) wire		tx_din_valid;
+  wire		tx_dout_valid;
+  wire		tx_din_ready;
+  wire		tx_din_valid;
   wire [23:0]	tx_din_bits;
-(* mark_debug = "true" *)  wire [9:0]  	dataq_rdcnt;
+  wire [9:0]  	dataq_rdcnt;
   wire [9:0]  	dataq_wrcnt;
- (* mark_debug = "true" *) wire		dataq_empty;
- (* mark_debug = "true" *) wire		dataq_full;
+  wire		dataq_empty;
+  wire		dataq_full;
 
   afifo_1024x24W afifo_data (
     .rst	        (s_dac_rst),
@@ -275,15 +315,15 @@ module axi_ofdmbbp_tx #(
 
   assign tx_din_valid = !dataq_empty;
  
- (* mark_debug = "true" *) wire [7:0]  	tx_cmd_length;
- (* mark_debug = "true" *) wire [1:0]  	tx_cmd_mode;
+  wire [7:0]  	tx_cmd_length;
+  wire [1:0]  	tx_cmd_mode;
   wire [21:0] 	tx_cmd_pause;
- (* mark_debug = "true" *) wire		tx_cmd_ready;
- (* mark_debug = "true" *) wire		tx_cmd_valid;
-(* mark_debug = "true" *)  wire [6:0]  	cmdq_rdcnt;
+  wire		tx_cmd_ready;
+  wire		tx_cmd_valid;
+ wire [6:0]  	cmdq_rdcnt;
  wire [6:0]  	cmdq_wrcnt;
- (* mark_debug = "true" *) wire		cmdq_empty;
- (* mark_debug = "true" *) wire		cmdq_full;
+  wire		cmdq_empty;
+  wire		cmdq_full;
 
   assign tx_cmd_valid = !cmdq_empty;
 
