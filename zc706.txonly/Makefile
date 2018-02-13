@@ -32,8 +32,8 @@ M_DEPS += $(ADI_HDL_DIR)/projects/common/zc706/zc706_system_constr.xdc
 M_DEPS += $(ADI_HDL_DIR)/projects/common/zc706/zc706_system_bd.tcl
 M_DEPS += zc706.tcl
 
-#M_VIVADO := vivado -mode batch -source
-M_VIVADO := vivado -mode tcl -source
+M_VIVADO := vivado -mode batch -source
+#M_VIVADO := vivado -mode tcl -source
 
 M_FLIST := *.cache
 M_FLIST += *.hw
