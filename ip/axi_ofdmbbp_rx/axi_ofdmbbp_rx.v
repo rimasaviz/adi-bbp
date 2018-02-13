@@ -55,6 +55,8 @@ module axi_ofdmbbp_rx #(
   reg     [15:0]  s_adc_rdata_i = 'd0;
   reg     [15:0]  s_adc_rdata_q = 'd0;
 
+  reg             up_adc_preset = 'd0;
+
   // internal signals
   wire    [ 3:0]  s_adc_raddr_s;
   wire    [15:0]  s_adc_rdata_i_s;
