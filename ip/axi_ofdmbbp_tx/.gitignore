@@ -1,0 +1,7 @@
+*.jou
+*.log
+component.xml
+*.xpr
+*.cache
+*.hw
+xgui
