@@ -1,0 +1,4 @@
+the bootgen_sysfiles.tgz and devicetree.dtb files came from the
+zynq-zed-adv7511-ad9361-fmcomms2-3
+directory on the most recent ADI provided SD card image, version:
+boot_2017_r1_2018_01_29

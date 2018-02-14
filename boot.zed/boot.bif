@@ -1,0 +1,6 @@
+the_ROM_image:
+{
+  [bootloader]./ADI/fsbl.elf
+  ./system_top.bit
+  ./ADI/u-boot-zed.elf
+}
