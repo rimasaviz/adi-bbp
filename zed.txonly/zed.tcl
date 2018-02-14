@@ -12,7 +12,7 @@ set sys_zynq 1
 create_project zed . -part xc7z020clg484-1 -force
 
 #set_property board_part xilinx.com:zc706:part0:1.2 [current_project]
-set_property board_part em.avnet.com:zed:part0:1.3 [current_project
+set_property board_part em.avnet.com:zed:part0:1.3 [current_project]
 
 set_property ip_repo_paths [list $ad_hdl_dir/library ../ip]  [current_fileset]
 
