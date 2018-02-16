@@ -52,24 +52,54 @@ module axi_ofdmbbp_rx #(
   reg     [15:0]  adc_wdata_i = 'd0;
   reg     [15:0]  adc_wdata_q = 'd0;
   reg             s_adc_sync = 'd0;
-  reg     [15:0]  s_adc_rdata_i = 'd0;
-  reg     [15:0]  s_adc_rdata_q = 'd0;
-
+ (* mark_debug = "true" *) reg     [15:0]  s_adc_rdata_i = 'd0;
+ (* mark_debug = "true" *) reg     [15:0]  s_adc_rdata_q = 'd0;
   reg             up_adc_preset = 'd0;
+
+//(* mark_debug = "true" *)
 
   // internal signals
   wire    [ 3:0]  s_adc_raddr_s;
   wire    [15:0]  s_adc_rdata_i_s;
   wire    [15:0]  s_adc_rdata_q_s;
-  wire            s_adc_wr_s;
   wire    [ 4:0]  s_adc_waddr_s;
-  wire    [ 7:0]  s_adc_wdata_s;
   wire            s_adc_rst;
-  
-  wire [23:0]	  up_rx_dout_bits;
 
   wire            s_clk;
   wire            s_clk_s;
+
+  // dataq
+  wire		rx_dout_valid;
+  wire [23:0]	rx_dout_bits;
+  wire [23:0]	up_rx_dout_bits;
+  wire [9:0]  	dataq_rdcnt;
+  wire [9:0]  	dataq_wrcnt;
+  wire		dataq_empty;
+  wire		dataq_full;
+  wire [15:0]   rx_cyclecnt;
+
+  // cmdq
+  wire [7:0]  	rx_cmd_length;
+  wire [1:0]  	rx_cmd_mode;
+  wire [6:0]  	rx_cmd_seed;
+  wire [6:0]  	rx_cmd_repeat;
+  wire [7:0] 	rx_cmd_pause;
+ (* mark_debug = "true" *) wire		rx_cmd_ready;
+ (* mark_debug = "true" *) wire		rx_cmd_valid;
+  wire [6:0]  	cmdq_rdcnt;
+  wire [6:0]  	cmdq_wrcnt;
+  wire		cmdq_empty;
+  wire		cmdq_full;
+
+  // coeffq
+  wire		coeff_dout_valid;
+  wire [15:0]	coeff_dout_bits_real;
+  wire [15:0]	coeff_dout_bits_imag;
+  wire [31:0]	up_coeff_dout_bits;
+  wire [9:0]  	coeffq_rdcnt;
+  wire [9:0]  	coeffq_wrcnt;
+  wire		coeffq_empty;
+  wire		coeffq_full;
 
   // adc- sample data transfer
   always @(posedge rst or posedge clk) begin
@@ -181,13 +211,14 @@ module axi_ofdmbbp_rx #(
     begin
       up_rack <= up_rreq;
       case (up_raddr)
-      16'h000: up_rdata <= 32'hCAFEBABE;
-      16'h001: up_rdata <= 32'hDEADBEEF;
-      16'h002: up_rdata <= up_scratch;
-      16'h004: up_rdata <= {31'd0, up_adc_preset};
-      16'h101: up_rdata <= {25'd0, cmdq_wrcnt};
-      16'h200: up_rdata <= {8'd0,  up_rx_dout_bits};
-      16'h201: up_rdata <= {22'd0, dataq_rdcnt};
+        14'h000: up_rdata <= 32'hCAFEBABE;
+        14'h002: up_rdata <= up_scratch;
+        14'h004: up_rdata <= {31'd0, up_adc_preset};
+        14'h101: up_rdata <= {25'd0, cmdq_wrcnt};
+        14'h200: up_rdata <= {8'd0,  up_rx_dout_bits};
+        14'h201: up_rdata <= {22'd0, dataq_rdcnt};
+        14'h300: up_rdata <= {8'd0,  up_coeff_dout_bits};
+        14'h301: up_rdata <= {22'd0, coeffq_rdcnt};
       default: up_rdata <= 'h00;
       endcase
     end
@@ -226,20 +257,31 @@ module axi_ofdmbbp_rx #(
   );
 
   // everything below here is specific to BBP
-  wire		rx_dout_valid;
-  wire [23:0]	rx_dout_bits;
-  wire [9:0]  	dataq_rdcnt;
-  wire [9:0]  	dataq_wrcnt;
-  wire		dataq_empty;
-  wire		dataq_full;
+  
 
-  afifo_1024x24W afifo_data (
+  assign rx_cmd_valid = !cmdq_empty;
+
+  afifo_128x32W cmdq (
+    .rst	      (s_adc_rst),
+    .wr_clk	      (s_axi_aclk),
+    .rd_clk	      (s_clk),
+    .din	      (up_wdata),
+    .wr_en	      (up_wreq && (up_waddr == 14'h0100)),
+    .rd_en	      (rx_cmd_ready && !cmdq_empty),
+    .dout	      ({rx_cmd_pause, rx_cmd_repeat, rx_cmd_seed, rx_cmd_mode, rx_cmd_length}),
+    .full	      (cmdq_full),
+    .empty	      (cmdq_empty),
+    .rd_data_count    (cmdq_rdcnt),
+    .wr_data_count    (cmdq_wrcnt)
+  );
+
+  afifo_1024x24W dataq (
     .rst	      (s_adc_rst),
     .wr_clk	      (s_clk),
     .rd_clk	      (s_axi_aclk),
     .din	      (rx_dout_bits),
-    .wr_en	      (rx_dout_valid && !dataq_empty),
-    .rd_en	      (up_rreq && (up_raddr == 14'h0200)),
+    .wr_en	      (rx_dout_valid),
+    .rd_en	      (up_rreq && (up_raddr == 14'h0200) && !dataq_empty),
     .dout	      (up_rx_dout_bits),
     .full	      (dataq_full),
     .empty	      (dataq_empty),
@@ -247,31 +289,18 @@ module axi_ofdmbbp_rx #(
     .wr_data_count    (dataq_wrcnt)
   );
 
-  wire [7:0]  	rx_cmd_length;
-  wire [1:0]  	rx_cmd_mode;
-  wire [21:0] 	rx_cmd_pause;
-  wire		rx_cmd_ready;
-  wire		rx_cmd_valid;
-
-  wire [6:0]  	cmdq_rdcnt;
-  wire [6:0]  	cmdq_wrcnt;
-  wire		cmdq_empty;
-  wire		cmdq_full;
-
-  assign rx_cmd_valid = !cmdq_empty;
-
-  afifo_128x32W afifo_cmd (
-    .rst	        (s_adc_rst),
-    .wr_clk	      (s_axi_aclk),
-    .rd_clk	      (s_clk),
-    .din	      (up_wdata),
-    .wr_en	      (up_wreq && (up_waddr == 14'h0100)),
-    .rd_en	      (rx_cmd_ready & !cmdq_empty),
-    .dout	      ({rx_cmd_pause, rx_cmd_mode, rx_cmd_length}),
-    .full	      (cmdq_full),
-    .empty	      (cmdq_empty),
-    .rd_data_count    (cmdq_rdcnt),
-    .wr_data_count    (cmdq_wrcnt)
+  afifo_1024x32W coeffq (
+    .rst	      (s_adc_rst),
+    .wr_clk	      (s_clk),
+    .rd_clk	      (s_axi_aclk),
+    .din	      ({coeff_dout_bits_real,coeff_dout_bits_imag}),
+    .wr_en	      (coeff_dout_valid),
+    .rd_en	      (up_rreq && (up_raddr == 14'h0300) && !coeffq_empty),
+    .dout	      (up_coeff_dout_bits),
+    .full	      (coeffq_full),
+    .empty	      (coeffq_empty),
+    .rd_data_count    (coeffq_rdcnt),
+    .wr_data_count    (coeffq_wrcnt)
   );
 
   FpgaRxWrapper rx (
@@ -281,15 +310,18 @@ module axi_ofdmbbp_rx #(
     .io_cmd_valid(rx_cmd_valid),
     .io_cmd_bits_length(rx_cmd_length),
     .io_cmd_bits_mode(rx_cmd_mode),
-    .io_cmd_bits_pause('d0),
+    .io_cmd_bits_seed(rx_cmd_seed),
+    .io_cmd_bits_repeat(rx_cmd_repeat),
+    .io_cmd_bits_pause('h0),
     .io_start(),
-    .io_din_real(s_adc_rdata_i_s),
-    .io_din_imag(s_adc_rdata_q_s),
+    .io_din_real({s_adc_rdata_i[11:0], 4'd0}),
+    .io_din_imag({s_adc_rdata_q[11:0], 4'd0}),
     .io_dout_valid(rx_dout_valid),
     .io_dout_bits(rx_dout_bits),
-    .io_coeff_dout_valid(),
-    .io_coeff_dout_bits_real(),
-    .io_coeff_dout_bits_imag(),
+    .io_coeff_dout_valid(coeff_dout_valid),
+    .io_coeff_dout_bits_real(coeff_dout_bits_real),
+    .io_coeff_dout_bits_imag(coeff_dout_bits_imag),
+    .io_rx_cyclecnt(rx_cyclecnt),
     .io_adc_raddr(s_adc_raddr_s)
   );
 
