@@ -32,7 +32,7 @@ M_DEPS += $(ADI_HDL_DIR)/projects/fmcomms2/zed/system_bd.tcl
 M_DEPS += $(ADI_HDL_DIR)/projects/fmcomms2/common/fmcomms2_bd.tcl
 M_DEPS += $(ADI_HDL_DIR)/projects/common/zed/zed_system_constr.xdc
 M_DEPS += $(ADI_HDL_DIR)/projects/common/zed/zed_system_bd.tcl
-M_DEPS += zed.tcl
+M_DEPS += zed.txonly.tcl
 
 M_VIVADO := vivado -mode batch -source
 #M_VIVADO := vivado -mode tcl -source
@@ -81,7 +81,7 @@ clean-all:clean
 
 xcomm2ip_zed.sdk/system_top.hdf: $(M_DEPS)
 	rm -rf $(M_FLIST)
-	$(M_VIVADO) zed.tcl
+	$(M_VIVADO) zed.txonly.tcl
 
 #	$(M_VIVADO) zed.tcl >> zed_vivado.log 2>&1
 

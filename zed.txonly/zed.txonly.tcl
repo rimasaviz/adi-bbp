@@ -9,7 +9,7 @@ source $ad_hdl_dir/projects/scripts/adi_project.tcl
 set sys_zynq 1
 
 #create_project zc706 . -part xc7z045ffg900-2 -force
-create_project zed . -part xc7z020clg484-1 -force
+create_project zed.txonly . -part xc7z020clg484-1 -force
 
 #set_property board_part xilinx.com:zc706:part0:1.2 [current_project]
 set_property board_part em.avnet.com:zed:part0:1.3 [current_project]
@@ -33,7 +33,7 @@ delete_bd_objs [get_bd_nets -of_objects [find_bd_objs -relation connected_to [ge
 delete_bd_objs [get_bd_nets -of_objects [find_bd_objs -relation connected_to [get_bd_pins axi_ad9361/dac_dunf]]]
 
 set axi_ofdmbbp_tx [create_bd_cell -type ip -vlnv analog.com:user:axi_ofdmbbp_tx:1.0 axi_ofdmbbp_tx]
-set_property -dict [list CONFIG.XCOMM2IP_1T1R_OR_2T2R_N {1}] $axi_ofdmbbp_tx
+set_property -dict [list CONFIG.XCOMM2IP_1T1R_OR_2T2R_N {0}] $axi_ofdmbbp_tx
 
 ad_cpu_interconnect 0x79040000 axi_ofdmbbp_tx
 
@@ -73,9 +73,9 @@ regenerate_bd_layout
 save_bd_design
 validate_bd_design
 
-generate_target {synthesis implementation} [get_files zed.srcs/sources_1/bd/system/system.bd]
-make_wrapper -files [get_files zed.srcs/sources_1/bd/system/system.bd] -top
-import_files -force -norecurse -fileset sources_1 zed.srcs/sources_1/bd/system/hdl/system_wrapper.v
+generate_target {synthesis implementation} [get_files zed.txonly.srcs/sources_1/bd/system/system.bd]
+make_wrapper -files [get_files zed.txonly.srcs/sources_1/bd/system/system.bd] -top
+import_files -force -norecurse -fileset sources_1 zed.txonly.srcs/sources_1/bd/system/hdl/system_wrapper.v
 
 adi_project_files zed [list \
   "$ad_hdl_dir/library/xilinx/common/ad_iobuf.v" \
