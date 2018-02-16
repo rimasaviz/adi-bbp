@@ -87,6 +87,32 @@ module axi_ofdmbbp_tx #(
   wire            s_clk;
   wire            s_clk_s;
 
+  wire		tx_din_ready;
+  wire		tx_din_valid;
+  wire [23:0]	tx_din_bits;
+  wire [9:0]  	dataq_rdcnt;
+  wire [9:0]  	dataq_wrcnt;
+  wire		dataq_empty;
+  wire		dataq_full;
+
+  wire [7:0]  	tx_cmd_length;
+  wire [1:0]  	tx_cmd_mode;
+  wire [6:0]    tx_cmd_seed;
+  wire [6:0]    tx_cmd_repeat;
+  wire [7:0] 	tx_cmd_pause;
+
+  wire		tx_cmd_ready;
+  wire		tx_cmd_valid;
+  wire [7:0]  	cmdq_rdcnt;
+  wire [7:0]  	cmdq_wrcnt;
+  wire		cmdq_empty;
+  wire		cmdq_full;
+
+
+ (* mark_debug = "true" *) wire		tx_dout_valid;
+ (* mark_debug = "true" *) wire [11:0] tx_dout_bits_i;
+ (* mark_debug = "true" *) wire [11:0] tx_dout_bits_q;
+
  // assign dac_dovf = 1'b0; //dac_dovf_int;
  // assign dac_dunf = 1'b0; //dac_dunf_int;
 
@@ -290,22 +316,13 @@ module axi_ofdmbbp_tx #(
   );
 
   // everything below here is specific to BBP
-  wire		tx_dout_valid;
-  wire		tx_din_ready;
-  wire		tx_din_valid;
-  wire [23:0]	tx_din_bits;
-  wire [9:0]  	dataq_rdcnt;
-  wire [9:0]  	dataq_wrcnt;
-  wire		dataq_empty;
-  wire		dataq_full;
-
   afifo_1024x24W afifo_data (
     .rst	        (s_dac_rst),
     .wr_clk	      (s_axi_aclk),
     .rd_clk	      (s_clk),
     .din	        (up_wdata[23:0]),
     .wr_en	      (up_wreq && (up_waddr == 14'h0200)),
-    .rd_en	      (tx_din_ready & !dataq_empty),
+    .rd_en	      (tx_din_ready),
     .dout	        (tx_din_bits),
     .full	        (dataq_full),
     .empty	      (dataq_empty),
@@ -314,17 +331,6 @@ module axi_ofdmbbp_tx #(
   );
 
   assign tx_din_valid = !dataq_empty;
- 
-  wire [7:0]  	tx_cmd_length;
-  wire [1:0]  	tx_cmd_mode;
-  wire [21:0] 	tx_cmd_pause;
-  wire		tx_cmd_ready;
-  wire		tx_cmd_valid;
- wire [6:0]  	cmdq_rdcnt;
- wire [6:0]  	cmdq_wrcnt;
-  wire		cmdq_empty;
-  wire		cmdq_full;
-
   assign tx_cmd_valid = !cmdq_empty;
 
   afifo_128x32W afifo_cmd (
@@ -334,7 +340,7 @@ module axi_ofdmbbp_tx #(
     .din	        (up_wdata),
     .wr_en	      (up_wreq && (up_waddr == 14'h0100)),
     .rd_en	      (tx_cmd_ready & !cmdq_empty),
-    .dout	      ({tx_cmd_pause, tx_cmd_mode, tx_cmd_length}),
+    .dout	      ({tx_cmd_pause, tx_cmd_repeat, tx_cmd_seed, tx_cmd_mode, tx_cmd_length}),
     .full	      (cmdq_full),
     .empty	      (cmdq_empty),
     .rd_data_count    (cmdq_rdcnt),
@@ -348,14 +354,18 @@ module axi_ofdmbbp_tx #(
     .io_cmd_valid(tx_cmd_valid),
     .io_cmd_bits_length(tx_cmd_length),
     .io_cmd_bits_mode(tx_cmd_mode),
+    .io_cmd_bits_seed(tx_cmd_seed),
+    .io_cmd_bits_repeat(tx_cmd_repeat),
     .io_cmd_bits_pause(tx_cmd_pause),
     .io_din_ready(tx_din_ready),
     .io_din_valid(tx_din_valid),
     .io_din_bits(tx_din_bits),
     .io_dout_valid(tx_dout_valid),
-    .io_dout_bits_real(s_dac_wdata_i_s),
-    .io_dout_bits_imag(s_dac_wdata_q_s),
+    .io_dout_bits_real(tx_dout_bits_i),
+    .io_dout_bits_imag(tx_dout_bits_q),
     .io_dac_waddr(s_dac_waddr_s)
   );
+  assign s_dac_wdata_i_s = {tx_dout_bits_i, 4'd0};
+  assign s_dac_wdata_q_s = {tx_dout_bits_q, 4'd0};
 
 endmodule

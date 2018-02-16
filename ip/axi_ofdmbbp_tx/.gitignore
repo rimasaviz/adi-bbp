@@ -5,3 +5,4 @@ component.xml
 *.cache
 *.hw
 xgui
+*.runs

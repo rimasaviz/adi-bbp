@@ -16,9 +16,8 @@ M_DEPS += $(ADI_HDL_DIR)/library/common/up_axi.v
 M_DEPS += axi_ofdmbbp_tx_constr.xdc
 M_DEPS += axi_ofdmbbp_tx.v
 M_DEPS += FpgaTxWrapper.v
-M_DEPS += xilinx-ip/afifo_1024x24W/afifo_1024x24W.xci 
-M_DEPS += xilinx-ip/afifo_128x32W/afifo_128x32W.xci 
-#M_DEPS += ofdmRxBlock.v
+M_DEPS += ../../xilinx-ip/afifo_1024x24W/afifo_1024x24W.xci 
+M_DEPS += ../../xilinx-ip/afifo_128x32W/afifo_128x32W.xci 
 
 M_VIVADO := vivado -mode batch -source
 
