@@ -1,5 +1,5 @@
 
-module circularTable12(
+module circularTable16(
   input                                    clock,
   input      [3:0] addr,
   output reg [31:0] data
@@ -18,6 +18,10 @@ module circularTable12(
       4'b1001: data <= 32'h7ffff5;
       4'b1010: data <= 32'h3fffff;
       4'b1011: data <= 32'h200000;
+      4'b1100: data <= 32'h100000;
+      4'b1101: data <= 32'h80000;
+      4'b1110: data <= 32'h40000;
+      4'b1111: data <= 32'h20000;
 
       default: data <= 32'h0;
     endcase

@@ -93,8 +93,8 @@ module axi_ofdmbbp_rx_sync #(
 
   // coeffq
   wire		coeff_dout_valid;
-  wire [11:0]	coeff_dout_bits_real;
-  wire [11:0]	coeff_dout_bits_imag;
+  wire [15:0]	coeff_dout_bits_real;
+  wire [15:0]	coeff_dout_bits_imag;
   wire [31:0]	up_coeff_dout_bits;
   wire [9:0]  	coeffq_rdcnt;
   wire [9:0]  	coeffq_wrcnt;
@@ -102,8 +102,8 @@ module axi_ofdmbbp_rx_sync #(
   wire		coeffq_full;
 
   // sync
-(* mark_debug = "true" *)  wire [11:0] sync_dout_i;
-(* mark_debug = "true" *)  wire [11:0] sync_dout_q;
+(* mark_debug = "true" *)  wire [15:0] sync_dout_i;
+(* mark_debug = "true" *)  wire [15:0] sync_dout_q;
 (* mark_debug = "true" *)  wire sync_packetDetect;
   reg [7:0]   reg_autocorrConfig_depthApart = 8'd64;
   reg [7:0]   reg_autocorrConfig_depthOverlap = 8'd64;
@@ -335,7 +335,7 @@ module axi_ofdmbbp_rx_sync #(
     .rst	      (s_adc_rst),
     .wr_clk	      (s_clk),
     .rd_clk	      (s_axi_aclk),
-    .din	      ({coeff_dout_bits_real,4'd0,coeff_dout_bits_imag,4'd0}),
+    .din	      ({coeff_dout_bits_real,coeff_dout_bits_imag}),
     .wr_en	      (coeff_dout_valid),
     .rd_en	      (up_rreq && (up_raddr == 14'h0300) && !coeffq_empty),
     .dout	      (up_coeff_dout_bits),
@@ -349,8 +349,8 @@ module axi_ofdmbbp_rx_sync #(
     .clock(s_clk),
     .reset(s_adc_rst),
     .io_in_valid(1'b1),
-    .io_in_bits_real(s_adc_rdata_i[11:0]),
-    .io_in_bits_imag(s_adc_rdata_q[11:0]),
+    .io_in_bits_real({s_adc_rdata_i[11:0], 4'd0}),
+    .io_in_bits_imag({s_adc_rdata_q[11:0], 4'd0}),
     .io_out_valid(),
     .io_out_bits_real(sync_dout_i),
     .io_out_bits_imag(sync_dout_q),

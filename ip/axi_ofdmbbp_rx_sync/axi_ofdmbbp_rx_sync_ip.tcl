@@ -14,7 +14,7 @@ adi_ip_files axi_ofdmbbp_rx_sync [list \
   "../../xilinx-ip/afifo_1024x32W/afifo_1024x32W.xci" \
   "../../xilinx-ip/afifo_128x32W/afifo_128x32W.xci" \
   "FpgaRxWrapper.v" \
-  "circularTable12.v" \
+  "circularTable16.v" \
   "NCOTableLUT.v" \
   "Sync.v" \
   "axi_ofdmbbp_rx_sync_constr.xdc" \
